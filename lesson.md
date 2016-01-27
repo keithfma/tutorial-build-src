@@ -139,11 +139,65 @@ gcc main.c WriteMyString.c -o write
 ./write
 ```
 
-## Linking external dependencies
+It is also quite common to separate out the process into two steps:
+1. source code -> object code
+2. object code -> executable (or library)
+The reason is that this allows you to reduce compiling time by only recompiling objects that need to be updated. This seems (and is) silly for small projects, but becomes important quickly. We will use this approach later when we discuss automating the build process.
+```shell
+gcc -c WriteMyString.c
+gcc -c main.c
+gcc WriteMyString.o main.o -o write
+./write
+```
+
+Note that it is **not** necessary to include the header file on the `gcc` command line. This makes sense since we know that the (bundeled) preprocessing step will append any required headers to the source code before it is compiled.
+
+There is one caveat: the preprocessor must be able to find the header files in order to include them. Our example works because `header.h` is in the working directory when we run `gcc`. We can break it by moving the header to a new subdirectory, like so:
+```shell
+mkdir hdr
+mv header.c hdr
+gcc main.c WriteMyString.c -o write
+```
+
+The above commands give the output error:
+```shell
+main.c:4:20: fatal error: header.h: No such file or directory
+ #include "header.h"
+                    ^
+compilation terminated.
+```
+
+We can fix this by specifically telling `gcc` where it can find the requisite headers, using the **`-I`** flag:
+```shell
+gcc -Ihdr main.c WriteMyString.c -o write
+```
+
+This is most often need in the case where you wish to use external libraries installed in non-standard locations. We will explore this case below.
+
+## Linking external libraries (shared & static)
+
+- static vs shared
+- shared libary file names
+- standard location (ldconfig)
+- non-standard location
+- running execuatables that require shared libraries (ldd)
+- useful environment variables (LD_LIBRARY_PATH)
 
 ## Automating the build process with GNU Make
 
+- return to multifile example 
+- dependency analysis
+- write simple makefile
+- add "clean" target
+- show "fancy" makefile 
+- challenge: modify Makefile to work for the external lib example
+
 ## Building with Autotools: configure; make; make install
+
+- discuss the motivation
+- demo 
+- help, setting options
+- challenge, build and install in a custom location
 
 ## Compilers
 
