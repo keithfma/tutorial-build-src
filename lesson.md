@@ -34,11 +34,16 @@ Hello World
 ``` 
 
 More happened here than meets the eye. In fact, this command wraps up 4 steps of the build process:
+  1. Preprocess
+  2. Compile
+  3. Assemble
+  4. Link
+As a side note, this is why I use the word _build_rather than _compile_ in the name of this tutorial.
 
 ![](fig/GCC_CompilationProcess.png)
 Figure source: https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
 
-### Preprocessing: interpret *preprocessor directives* and **modify the source code** accordingly. 
+### Preprocess: interpret *preprocessor directives* and **modify the source code** accordingly. 
 
 Some common directives are:
   - `#include` 
@@ -59,16 +64,24 @@ Some common directives are:
         #endif
         ```
 We *could* perform just this step of the build process like so:
-
 ```shell
 cpp hello.c hello_pp.c
 ```
 
-Examining the output file (`vim hello_pp.c`) shows that the long and messy `stdio.h` header has been appended to our simple code. You may also like to explore adding `#define` statements, or conditional code blocks.
+Examining the output file (**`vim hello_pp.c`**) shows that the long and messy `stdio.h` header has been appended to our simple code. You may also like to explore adding `#define` statements, or conditional code blocks.
 
-### Compilation: translate (modified) source code into *assembly code*
-  - Assembly code is...
+### Compile: translate (modified) source code into *assembly code*
 
+Assembly code is a low-level programming language with commands that correspond to machine instructions for a particular type of hardware. It is still just plain text --- you can read assembly and write it too if you so desire.
+
+To perform just the compilation step of the build process, we would run:
+```
+gcc -S -c hello_pp.c -o hello_pp.s
+```
+
+Examining the output file (**`vim hello_pp.s`**) shows that processor-specific instructions needed to run our program on this specific system. Interestingly, for such a simple program as ours, the assembly code is actually shorter than the preprocesses source code (though not the original source code).
+
+### Assemble
 
 ## Compilers
 
