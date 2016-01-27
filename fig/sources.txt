@@ -1,0 +1,4 @@
+LIST OF SOURCE FOR ALL DOWNLOADED FIGURES:
+
+GCC_CompilationProcess.png
+https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
