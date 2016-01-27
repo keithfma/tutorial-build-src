@@ -463,14 +463,89 @@ See if you can successfully build and run this program. For an additional challe
 
 ## Automating the build process with GNU Make
 
-- return to multifile example 
-- dependency analysis
-- write simple makefile
-- add "clean" target
-- show "fancy" makefile 
-- challenge: modify Makefile to work for the external lib example
+The build process can become quite tedious for all but the smallest projects. There are many ways that we might automate this process. The simplest would be to write a shell script that runs the build commands each time we invoke it. Let's take the simple `hello.c` program as a test case:
+```shell
+#!/bin/bash
+gcc -c hello.c
+gcc hello.o -o hello
+```
+
+This works fine for small projects, but for large multi-file projects, we would have to compile *all* the sources every time we change *any* of the sources. 
+
+The Make utility provides a useful way around this problem. The solution is that we (the programmer) write a special script that defines all the dependencies between source files, edit one or more files in our project, then invoke Make to re-compile only those files that are affected by any changes.
+
+Make is a mini-programming language unto itself, so I will only touch upon the simplest useage. For the `hello` program, a makefile might look like this:
+```shell
+hello: hello.o
+    gcc hello.o -o hello
+
+hello.o: hello.c
+    gcc -c hello.c
+
+clean:
+    rm hello hello.o
+
+.PHONY: clean
+```
+
+The syntax here is `target: prerequisite_1 prerequisite_2 etc`. The command block that follows will be executed to generate the target if any of the prerequisites have been modified.
+
+We can then compile using the `make` command:
+```shell
+make 
+make clean
+``` 
+
+Notice that if no changes are made to the source files, make does not recompile anything --- there is no need to do so.
+
+Let's look at an example for our first multi-file program:
+```shell
+write: main.o WriteMyString.o
+        gcc main.o WriteMyString.o -o write
+
+main.o: main.c header.h
+        gcc -c main.c
+
+WriteMyString.o: WriteMyString.c
+        gcc -c WriteMyString.c
+
+clean: 
+        rm write *.o
+```
+
+### Challenge
+
+Starting from the template below (or using our previous Makefile), see if you can write your own makefile for the `multi_fav_num` program:
+```shell
+fav: 
+        gcc _____ ______ -o fav 
+
+main.o: _____ ______ 
+        gcc _______
+
+______: other.o 
+        _________________
+
+clean: 
+        rm _____ _____
+```
 
 ## Building with Autotools: configure; make; make install
+
+For complex or widely distributed software packages with many dependencies, using Make alone can become a headache since you may have to find the location of numerous libraries and headers and modify the Makefile to work on your system. The Autotools workflow is one common solution to this issue. A typical build process is:
+```shell
+./configure
+make 
+make install
+```
+
+What is happening here is that the `configure` script automatically generates a Makefile that (should) work for your system. In practice, it often needs help finding libraries if they are hidden away in non-standard locations. For this purpose, there a typically a list of command-line parameters that you can add to the configure command line. Try:
+```shell 
+./configure --help
+```
+to see a list of the available options. One particularly common option is `--prefix`, which allows you to install in non-standard locations. 
+
+As a quick example, lets try compiling the program NCVIEW, a simple visualization tool for NetCDF datasets common in many scientific disciplines. The source code is in the XXX directory...
 
 - discuss the motivation
 - demo 
@@ -484,4 +559,5 @@ See if you can successfully build and run this program. For an additional challe
 - [Programming in C: Writing Larger Programs](https://www.cs.cf.ac.uk/Dave/C/node35.html) 
 - [The Linux Information Project](http://www.linfo.org/)
 - [C/C++ library programming on Linux](http://www.techytalk.info/c-cplusplus-library-programming-on-linux-part-one-static-libraries/)
+- [Ncview: a netCDF visual browser](http://meteora.ucsd.edu/~pierce/ncview_home_page.html)
 
