@@ -141,7 +141,7 @@ gcc main.c WriteMyString.c -o write
 
 It is also quite common to separate out the process into two steps:
 1. source code -> object code
-2. object code -> executable (or library)
+3. object code -> executable (or library)
 
 The reason is that this allows you to reduce compiling time by only recompiling objects that need to be updated. This seems (and is) silly for small projects, but becomes important quickly. We will use this approach later when we discuss automating the build process.
 ```shell
@@ -179,7 +179,23 @@ This is most often need in the case where you wish to use external libraries ins
 
 ### Challenge
 
-TBD. Ideally, a larger multifile program with a few headers and an obnoxious directory structure.
+In the folder `multi_fav_num` you will find another simple multi-file program. Build this source code to a program named `fav_num` using separate compile and link steps. Once you have done this successfully, change the number defined in `other.c` and rebuild. You should *not* have to recompile `main.c` to do this.
+
+Solution:
+```shell
+gcc -c main.c
+gcc -c other.c
+gcc main.o other.o -o fav_num
+./fav_num
+
+vim other.c
+
+gcc -c other.c
+gcc main.o other.o -o fav_num
+./fav_num
+```
+ 
+
 
 ## Linking external libraries (shared & static)
 
