@@ -142,6 +142,7 @@ gcc main.c WriteMyString.c -o write
 It is also quite common to separate out the process into two steps:
 1. source code -> object code
 2. object code -> executable (or library)
+
 The reason is that this allows you to reduce compiling time by only recompiling objects that need to be updated. This seems (and is) silly for small projects, but becomes important quickly. We will use this approach later when we discuss automating the build process.
 ```shell
 gcc -c WriteMyString.c
@@ -149,6 +150,8 @@ gcc -c main.c
 gcc WriteMyString.o main.o -o write
 ./write
 ```
+
+### Including header files
 
 Note that it is **not** necessary to include the header file on the `gcc` command line. This makes sense since we know that the (bundeled) preprocessing step will append any required headers to the source code before it is compiled.
 
@@ -173,6 +176,10 @@ gcc -Ihdr main.c WriteMyString.c -o write
 ```
 
 This is most often need in the case where you wish to use external libraries installed in non-standard locations. We will explore this case below.
+
+### Challenge
+
+TBD. Ideally, a larger multifile program with a few headers and an obnoxious directory structure.
 
 ## Linking external libraries (shared & static)
 
