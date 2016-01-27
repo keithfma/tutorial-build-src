@@ -83,6 +83,30 @@ Examining the output file (**`vim hello_pp.s`**) shows that processor-specific i
 
 ### Assemble
 
+Assembly code is then translated into *machine code* or *object code* ([more](www.linfo.org/object_code.html)). This is a binary representation of the actions your computer needs to take to run your program. It is no longer human-readable, but it can be understood by your processor.
+
+To perform just this step of the build process, we would run:
+```shell
+gcc -c hello_pp.s -o hello.o
+```
+
+You can try to view this *object file* like we did the other intermediate steps, but the result will not be terribly useful (`vim hello.o`). Your text editor is trying to interpret binary machine language commands as ASCII characters, and (mostly) failing. Perhaps the most interesting result of doing so is that there are intelligable bits --- these are the few variables, etc, that actually are ASCII characters.
+
+Also note that object files are *not* executables, even if they are totally self-contained.
+
+### Link
+
+In the final step, the *linker* combines the object file with any external functions it needs (e.g. library functions or functions from other source files). In our case, this would include `printf` from the C standard library.
+
+To perform just this step of the build process, we would run:
+```shell
+gcc hello.o -o hello
+```
+
+### Fortran equivalent
+
+### Challege:
+
 ## Compilers
 
 - Many compilers available, three of the most popular are:
@@ -98,4 +122,5 @@ Examining the output file (**`vim hello_pp.s`**) shows that processor-specific i
 - [GCC and Make: Compiling, Linking and Building C/C++ Applications](https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html)
 - [Programming in C: C/C++ Program Compilation](https://www.cs.cf.ac.uk/Dave/C/node3.html)
 - [Programming in C: Writing Larger Programs](https://www.cs.cf.ac.uk/Dave/C/node35.html) 
+- [The Linux Information Project](http://www.linfo.org/)
 
