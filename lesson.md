@@ -58,8 +58,13 @@ Some common directives are:
         a=1; b=0; c=0;
         #endif
         ```
-
 We *could* perform just this step of the build process like so:
+
+```shell
+cpp hello.c hello_pp.c
+```
+
+Examining the output file (`vim hello_pp.c`) shows that the long and messy `stdio.h` header has been appended to our simple code. You may also like to explore adding `#define` statements, or conditional code blocks.
 
 ### Compilation: translate (modified) source code into *assembly code*
   - Assembly code is...
