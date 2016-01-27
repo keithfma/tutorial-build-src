@@ -8,7 +8,7 @@
 2. Log into the SCC, either using the Mobaxterm on the lab computers or your favorite terminal on your laptop. 
 3. Create a new working directory, then download and unpack the lesson materials (LINK NEEDED) 
 
-## Overview by example
+## Building a single-file program 
 
 Let's start with a simple example: building a "hello world" C program with the GCC compiler.
 
@@ -102,10 +102,30 @@ To perform just this step of the build process, we would run:
 ```shell
 gcc hello.o -o hello
 ```
-
-### Fortran equivalent
-
 ### Challege:
+
+Compile and run the following program (`squares.c`):
+```c
+#include <stdio.h>
+main()
+{ 
+	int i;
+
+	printf("\t Number \t\t Square of Number\n\n");
+
+	for (i=0; i<=25; ++i)
+	printf("\t %d \t\t\t %d \n", i, i*i);
+}
+```
+If you have some extra time, try walking through the process step-by-step and inspecting the results. 
+
+Solution:
+```shell
+gcc squares.c -o squares
+./squares
+```
+
+## Building a multi-file program
 
 ## Compilers
 
