@@ -276,12 +276,11 @@ libc.so.6 => /lib64/libc.so.6 (0x00007ffc691bc000)
 ```
 Which shows that our executable requires a few basic system libraries as well as the math library we explicitly included, and that all of these dependencies are found by the linker.
 
-#### Mini-challenge
+### Challenge
 
 Before moving on, let's take a few minutes to break this build process. Try the following and read the error messages carefully. These are your hints to fixing a broken build process.
 1. Delete `#include <math.h>` from `roots.c`
 2. Omit `-lm` from the linking step
-
 
 
 #### Sidebar: where does the preprocessor look to find header files?
@@ -455,11 +454,9 @@ We can confirm that this worked by running the program (resetting LD_LIBRARY_PAT
 readelf -d use_ctest
 ```
 
-### Challenge (skeleton only)
+### Challenge
 
-The program XXX makes use of the XXX library. This library is installed on the SCC in the following directory:
-
-See if you can successfully build and run this program. For an additional challenge, try to do so using RUNPATH to hardcode the location of the shared library.
+Without using your history, try to re-compile and run the use_ctest program. For an additional challenge, try to do so using RUNPATH to hardcode the location of the shared library.
 
 ## Automating the build process with GNU Make
 
@@ -545,12 +542,33 @@ What is happening here is that the `configure` script automatically generates a 
 ```
 to see a list of the available options. One particularly common option is `--prefix`, which allows you to install in non-standard locations. 
 
-As a quick example, lets try compiling the program NCVIEW, a simple visualization tool for NetCDF datasets common in many scientific disciplines. The source code is in the XXX directory...
+As a quick example, lets try compiling the program NCVIEW, a simple visualization tool for NetCDF datasets common in many scientific disciplines. The source code is in the `ncview-2.1.6.tag.gz` compressed file. 
 
-- discuss the motivation
-- demo 
-- help, setting options
-- challenge, build and install in a custom location
+*Note: below is the script I wrote to do this build*
+```shell
+  #!/bin/bash
+  #
+  # Build ncview 2.1.4 for use on the BU SCC
+
+  # setup build environment
+  module load udunits
+  module load hdf5/1.8.11
+  module load netcdf/4.3.0
+  export LDFLAGS=-Wl,--enable-new-dtags
+
+  # build and install
+  cd build
+  ../src/configure \
+    --prefix=/projectnb/glaciermod/pkg/ncview/2.1.4/install \
+    --with-nc-config=/project/earth/packages/netcdf-4.3.0/bin/nc-config \
+    --with-udunits2_incdir=$SCC_UDUNITS_INCLUDE \
+    --with-udunits2_libdir=$SCC_UDUNITS_LIB
+
+  make clean
+  make 
+  make test 
+  make install
+```
 
 ## References
 
@@ -560,4 +578,5 @@ As a quick example, lets try compiling the program NCVIEW, a simple visualizatio
 - [The Linux Information Project](http://www.linfo.org/)
 - [C/C++ library programming on Linux](http://www.techytalk.info/c-cplusplus-library-programming-on-linux-part-one-static-libraries/)
 - [Ncview: a netCDF visual browser](http://meteora.ucsd.edu/~pierce/ncview_home_page.html)
+- [Creating and using shared libraries in Linux](codingfreak.blogspot.com/2009/12/creating-and-using-shared-libraries-in.html)
 
