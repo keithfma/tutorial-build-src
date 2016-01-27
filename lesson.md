@@ -124,8 +124,26 @@ Solution:
 gcc squares.c -o squares
 ./squares
 ```
-
 ## Building a multi-file program
+
+For all but the smallest programming projects, it is convenient to break up the source code into multiple files. Typically, these include a main function in one file, and one or more other files containing functions / subroutines called by main(). In addition, a custom header file is usually used to share custom data types, function prototypes, preprocessor macros, etc. 
+
+We will use a simple example program in the `src/multi` folder, which consists of:
+- `main.c`: The main driver function, which calls a subroutine and exits
+- `WriteMyString.c`: a module containing the subroutine called by main
+- `header.h`: one function prototype and one macro definition 
+
+The easiest way to compile such a program is to include all the required source files at the `gcc` command line:
+```shell
+gcc main.c WriteMyString.c -o write
+./write
+```
+
+## Linking external dependencies
+
+## Automating the build process with GNU Make
+
+## Building with Autotools: configure; make; make install
 
 ## Compilers
 
