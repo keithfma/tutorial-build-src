@@ -2,11 +2,16 @@
 
 ## Preparation
 
-1. Sign into the Etherpad: https://etherpad.wikimedia.org/p/bu_tutorial_build_src
-  - collaborative note-taking utility
-  - also a convenient way to share and resolve error messages for the code challenges
-2. Log into the SCC, either using the Mobaxterm on the lab computers or your favorite terminal on your laptop. 
-3. Create a new working directory, then download and unpack the lesson materials (LINK NEEDED) 
+* Sign into the [Etherpad](https://etherpad.wikimedia.org/p/bu_tutorial_build_src), 
+for collaborative notes and an easy way to share commands and error messages.
+* Log into the SCC, either using the Mobaxterm on the lab computers or your
+favorite terminal on your laptop.
+* Create a new working directory, then make a copy of the example files for the
+tutorial, like so:  
+```shell
+cd ~
+cp -r /projectnb/scv/keithma/tutorials/build_src/src tut
+```
 
 ## Building a single-file program 
 

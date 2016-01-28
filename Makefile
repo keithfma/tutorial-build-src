@@ -4,7 +4,7 @@
 all: lesson.html
 
 lesson.html: lesson.md
-	pandoc -f markdown_github -t html $< -o $@
+	pandoc -f markdown_github -t html -s -c swc.css $< -o $@
 
 clean:
 	rm lesson.html
