@@ -1,7 +1,5 @@
 # Building Software from Source Code in Linux
-
 ## Preparation
-
 * Sign into the [Etherpad](https://etherpad.wikimedia.org/p/bu_tutorial_build_src), 
 for collaborative notes and an easy way to share commands and error messages.
 * Log into the SCC, either using the Mobaxterm on the lab computers or your
