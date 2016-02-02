@@ -1,15 +1,20 @@
 # Building Software from Source Code in Linux
+
 ## Preparation
-* Sign into the [Etherpad](https://etherpad.wikimedia.org/p/bu_tutorial_build_src), 
-for collaborative notes and an easy way to share commands and error messages.
-* Log into the SCC, either using the Mobaxterm on the lab computers or your
-favorite terminal on your laptop.
-* Create a new working directory, then make a copy of the example files for the
-tutorial, like so:  
+
+* Sign into the [Etherpad](https://etherpad.wikimedia.org/p/bu_tutorial_build_src), used for collaborative notes and an easy way to share commands and error messages.
+* Log into the SCC, either using the Mobaxterm on the lab computers or your favorite terminal on your laptop.
+* Create a new working directory, then make a copy of the example files for the tutorial, like so:  
 ```shell
 cd ~
 cp -r /projectnb/scv/keithma/tutorials/build_src/src tut
 ```
+
+## Overview
+
+This lesson plan covers the (very) basics of building small projects from C source code using the GCC compiler, and automating this process using GNU Make. It is intended for scientists venturing into scientific programming, to help ease the frustrations that typically come up when starting to work in compiled programming languages. 
+
+The material is not unique, and borrows heavily from the references listed at the end of the lesson. Comments are always welcome!
 
 ## Building a single-file program 
 
@@ -30,7 +35,7 @@ To build a working executable from this file in the simplest way possible, run:
 $ gcc hello.c
 ```
 
-This command creates an executable with a default name of `a.out`. Running this prints the familiar message:
+This command creates an executable with a default name of `a.out`. Running this command prints the familiar message:
 ```
 $ a.out
 Hello World
@@ -41,12 +46,13 @@ More happened here than meets the eye. In fact, this command wraps up 4 steps of
   2. Compile
   3. Assemble
   4. Link
-As a side note, this is why I use the word _build_rather than _compile_ in the name of this tutorial.
 
 ![](fig/GCC_CompilationProcess.png)
 Figure source: https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html
 
-### Preprocess: interpret *preprocessor directives* and **modify the source code** accordingly. 
+### Step 1: Preprocess 
+
+In this step, `gcc` calls preprocessing program `cpp` to interpret *preprocessor directives* and *modify the source code* accordingly. 
 
 Some common directives are:
   - `#include` 
@@ -58,48 +64,49 @@ Some common directives are:
     - e.g. `#define PI 3.14159
 
   - `#ifdef ... #end`
-    - conditional compilation, the code block is included only if a certain macro is defined 
-    - e.g.: 
-
+    - conditional compilation, the code block is included only if a certain macro is defined, e.g: 
         ```c
         #ifdef TEST_CASE
         a=1; b=0; c=0;
         #endif
         ```
+
 We *could* perform just this step of the build process like so:
 ```shell
-cpp hello.c hello_pp.c
+cpp hello.c hello.i
 ```
 
-Examining the output file (**`vim hello_pp.c`**) shows that the long and messy `stdio.h` header has been appended to our simple code. You may also like to explore adding `#define` statements, or conditional code blocks.
+Examining the output file (**`vim hello.i`**) shows that the long and messy `stdio.h` header has been appended to our simple code. You may also like to explore adding `#define` statements, or conditional code blocks.
 
-### Compile: translate (modified) source code into *assembly code*
+### Step 2: Compile
+
+In this step, the (modified) source code is translated from the C programming language into *assembly code*.
 
 Assembly code is a low-level programming language with commands that correspond to machine instructions for a particular type of hardware. It is still just plain text --- you can read assembly and write it too if you so desire.
 
 To perform just the compilation step of the build process, we would run:
+```shell
+gcc -S -c hello.i -o hello.i
 ```
-gcc -S -c hello_pp.c -o hello_pp.s
-```
 
-Examining the output file (**`vim hello_pp.s`**) shows that processor-specific instructions needed to run our program on this specific system. Interestingly, for such a simple program as ours, the assembly code is actually shorter than the preprocesses source code (though not the original source code).
+Examining the output file (**`vim hello.s`**) shows that processor-specific instructions needed to run our program on this specific system. Interestingly, for such a simple program as ours, the assembly code is actually shorter than the preprocesses source code (though not the original source code).
 
-### Assemble
+### Step 3: Assemble
 
-Assembly code is then translated into *machine code* or *object code* ([more](www.linfo.org/object_code.html)). This is a binary representation of the actions your computer needs to take to run your program. It is no longer human-readable, but it can be understood by your processor.
+Assembly code is then translated into *object code* ([more](http://www.linfo.org/object_code.html)). This is a binary representation of the actions your computer needs to take to run your program. It is no longer human-readable, but it can be understood by your processor.
 
 To perform just this step of the build process, we would run:
 ```shell
-gcc -c hello_pp.s -o hello.o
+gcc -c hello.s -o hello.o
 ```
 
 You can try to view this *object file* like we did the other intermediate steps, but the result will not be terribly useful (`vim hello.o`). Your text editor is trying to interpret binary machine language commands as ASCII characters, and (mostly) failing. Perhaps the most interesting result of doing so is that there are intelligable bits --- these are the few variables, etc, that actually are ASCII characters.
 
-Also note that object files are *not* executables, even if they are totally self-contained.
+Also note that object files are *not* executables, you can't run them until after the next step.
 
-### Link
+### Step 4: Link
 
-In the final step, the *linker* combines the object file with any external functions it needs (e.g. library functions or functions from other source files). In our case, this would include `printf` from the C standard library.
+In the final step, `gcc` calls the *linker* program `ld` to combine the object file with any external functions it needs (e.g. library functions or functions from other source files). In our case, this would include `printf` from the C standard library.
 
 To perform just this step of the build process, we would run:
 ```shell
@@ -122,24 +129,24 @@ main()
 ```
 If you have some extra time, try walking through the process step-by-step and inspecting the results. 
 
-Solution:
+#### Solution:
 ```shell
 gcc squares.c -o squares
 ./squares
 ```
 ## Building a multi-file program
 
-For all but the smallest programming projects, it is convenient to break up the source code into multiple files. Typically, these include a main function in one file, and one or more other files containing functions / subroutines called by main(). In addition, a custom header file is usually used to share custom data types, function prototypes, preprocessor macros, etc. 
+For all but the smallest programming projects, it is convenient to break up the source code into multiple files. Typically, these include a main function in one file, and one or more other files containing functions / subroutines called by main(). In addition, a *header file* is usually used to share custom data types, function prototypes, preprocessor macros, etc. 
 
-We will use a simple example program in the `src/multi` folder, which consists of:
+We will use a simple example program in the `multi_string` folder, which consists of:
 - `main.c`: The main driver function, which calls a subroutine and exits
 - `WriteMyString.c`: a module containing the subroutine called by main
 - `header.h`: one function prototype and one macro definition 
 
 The easiest way to compile such a program is to include all the required source files at the `gcc` command line:
 ```shell
-gcc main.c WriteMyString.c -o write
-./write
+gcc main.c WriteMyString.c -o my_string
+./my_string
 ```
 
 It is also quite common to separate out the process into two steps:
@@ -162,7 +169,7 @@ There is one caveat: the preprocessor must be able to find the header files in o
 ```shell
 mkdir hdr
 mv header.c hdr
-gcc main.c WriteMyString.c -o write
+gcc main.c WriteMyString.c -o my_string
 ```
 
 The above commands give the output error:
@@ -175,7 +182,7 @@ compilation terminated.
 
 We can fix this by specifically telling `gcc` where it can find the requisite headers, using the **`-I`** flag:
 ```shell
-gcc -Ihdr main.c WriteMyString.c -o write
+gcc -I ./hdr main.c WriteMyString.c -o my_string
 ```
 
 This is most often need in the case where you wish to use external libraries installed in non-standard locations. We will explore this case below.
@@ -184,7 +191,8 @@ This is most often need in the case where you wish to use external libraries ins
 
 In the folder `multi_fav_num` you will find another simple multi-file program. Build this source code to a program named `fav_num` using separate compile and link steps. Once you have done this successfully, change the number defined in `other.c` and rebuild. You should *not* have to recompile `main.c` to do this.
 
-Solution:
+#### Solution:
+
 ```shell
 gcc -c main.c
 gcc -c other.c
@@ -200,29 +208,28 @@ gcc main.o other.o -o fav_num
 
 ## Linking external libraries
 
-NOTE: content in this section is (lightly) modified from [](https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html)
+NOTE: content in this section is (lightly) modified from [this site](https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html).
 
-A **library** is a collection of pre-compiled object files that can be linked into
- your programs via the linker. In simpler terms, they are machine code files
- that contain functions, etc, you can use in your programs. 
+A **library** is a collection of pre-compiled object files that can be linked into your programs via the linker. In simpler terms, they are machine code files that contain functions, etc, you can use in your programs.
  
  A few example functions that come from libraries are:
  - `printf()` from the `libc.so` shared library
  - `sqrt()` from the `libm.so` shared library
+
  We will return to these in a moment.
 
 ### Shared libraries vs static libraries 
 
 - A **static library** has file extension of `.a` (archive file).  When your program links a static library, the machine code of external functions used in your program is copied into the executable. At runtime, everything your program needs is wrapped up inside the executable. 
 
-- A **shared library** has file extension of ".so" (shared objects). When your program is linked against a shared library, only a small table is created in the executable. At runtime, the exectutable must be able to locate the functions listed in this table. This is done by the operating system - a process known as dynamic linking. 
+- A **shared library** has file extension of ".so" (shared objects). When your program is linked against a shared library, only a small table is created in the executable. At runtime, the exectutable must be able to locate the functions listed in this table. This is done by the operating system - a process known as *dynamic linking*. 
 
 Static libraries certainly seem simpler, but most programs use shared libraries and dynamic linking. There are several reasons why the added complexity is thought to be worth it:
 - Makes executable files smaller and saves disk space, because one copy of a library can be shared between multiple programs. 
 - Most operating systems allow one copy of a shared library in memory to be used by all running programs, saving memory.
 - If your libraries are updated, programs using shared libraries automatically take advantage of these updates, programs using static libraries would need to be recompiled. 
 
-Because of the advantage of dynamic linking, GCC, by default, links to the shared library if it is available.
+Because of the advantage of dynamic linking, GCC will prefer a shared library to a static library if both are available (by default).
 
 ### Building with shared libraries in default (known) locations
 
@@ -259,7 +266,7 @@ The first command preprocesses `roots.c`, appending the header files, and then t
 
 The second command links all of the object code into the executable. It does not need to find the header file (it is already compiled into `roots.o`) but it does need to find the library file. 
 
-Library files are included using the `-l` flag. Thier names are given *exlcuding the `lib` prefix* and *exluding the `.so` suffix*
+Library files are included using the `-l` flag. Thier names are given excluding the `lib` prefix and exluding the `.so` suffix.
 
 Just as we did above, we can combine the build steps into a single command:
 ```shell
@@ -286,7 +293,7 @@ Before moving on, let's take a few minutes to break this build process. Try the 
 2. Omit `-lm` from the linking step
 
 
-#### Sidebar: where does the preprocessor look to find header files?
+### Sidebar: where does the preprocessor look to find header files?
 
 The preprocessor will search some default paths for included header files. Before we go down the rabbit hole, it is important to note that you **do not** have to do this for a typical build, but the commands may prove useful when you are trying to work out why something fails to build.
 
@@ -322,9 +329,9 @@ Which has the following output:
 
 If we are really curious, we could open the header and see what it contains, but this is rarely necessary.
 
-#### Sidebar: where does the linker look to find libraries?
+### Sidebar: where does the linker look to find libraries?
 
-The linker will search some default paths for included library files. Before we go down the rabbit hole, it is important to note that you **do not** have to do this for a typical build, but the commands may prove useful when you are trying to work out why something fails to build.
+The linker will search some default paths for included library files. Again, it is important to note that you **do not** have to do this for a typical build, but the commands may prove useful when you are trying to work out why something fails to build.
 
 To look for the library, we can run the following command to get a list of all library files the linker is aware of, then search that list for the math library we need:
 ```shell
@@ -354,11 +361,12 @@ The output of this command contains the following line, which shows us that it d
 ```
 ### Building with shared libraries in non-default (unknown) locations
 
-*internal note: the following command lines build the libctest.so shared library:*
+*note: the following command lines build the libctest.so shared library used in the example below:*
 ```shell
 gcc -Wall -fPIC -c ctest1.c ctest2.c
 gcc -shared -Wl,-soname,libctest.so -o libctest.so ctest1.o ctest2.o
 ```
+*end note*
 
 Let's switch to a new bit of example code, called `use_ctest.c` that makes use of a (very simple) custom library in the `ctest` directory:
 ```c
@@ -418,39 +426,22 @@ libc.so.6 => /lib64/libc.so.6 (0x00007f802d21b000)
 ```
 
 The output clearly shows that it does not. The problem here is that the dynamic linker will only search the default paths unless we:
-1. Permanently add our custom library to this search path
+1. Permanently add our custom library to this search path. This option is not covered here - I am assuming that many of you will be working on clusters and other systems where you do not have root permissions.
 
-This option is not covered here - I am assuming that many of you will be working on clusters and other systems where you do not have root permissions.
-
-2. Specify the location of non-standard libraries using the LD_LIBRARY_PATH variable
-
-LD_LIBRARY_PATH contains a colon (:) separated list of directories where the dynamic linker should look for shared libraries. The linker will search these directories *before* the default system paths. 
-
-You can define the value of LD_LIBRARY_PATH for a particular command only by preceeding the command with the definintion, like so:
+2. Specify the location of non-standard libraries using the `LD_LIBRARY_PATH` variable. `LD_LIBRARY_PATH` contains a colon (:) separated list of directories where the dynamic linker should look for shared libraries. The linker will search these directories *before* the default system paths. You can define the value of LD_LIBRARY_PATH for a particular command only by preceeding the command with the definintion, like so:
 ```shell
 LD_LIBRARY_PATH=ctest_dir/lib:$LD_LIBRARY_PATH ./use_ctest
 ```
-
 Or define it for your whole shell as an environment variable:
 ```shell
 export LD_LIBRARY_PATH=/ctest_dir/lib:$LD_LIBRARY_PATH
 ./use_ctest
 ```
 
-#### Sidebar: module system on the SCC
-
-In fact, the `module` system used to manange software packages on the SCC mostly just manipulates the PATH and LD_LIBRARY_PATH environment variables. The effect is to make programs available to the user, and to make associate dynamic libraries available to those programs and others. Take a look at your favorite module to see for yourself, e.g.:
-```shell
-module show R
-```
-
-3. Hard-code the location of non-standard libraries into the executable
-
-Setting (and forgeting to set) LD_LIBRARY_PATH all the time can be tiresome. An alternative approach is to burn the location of the shared libraries into the executable as an RPATH or RUNPATH. This is done by adding some additional flags for the linker, like so:
+3. Hard-code the location of non-standard libraries into the executable. Setting (and forgeting to set) LD_LIBRARY_PATH all the time can be tiresome. An alternative approach is to burn the location of the shared libraries into the executable as an RPATH or RUNPATH. This is done by adding some additional flags for the linker, like so:
 ```shell
 gcc -Lctest_dir/lib  use_ctest.o -lctest -Wl,rpath,ctest_dir/lib,--enable-new-dtags- use_ctest
 ```
-
 We can confirm that this worked by running the program (resetting LD_LIBRARY_PATH first if needed), and more explicitly, by examining the executable directly:
 ```shell
 ./use_ctest
@@ -463,7 +454,7 @@ Without using your history, try to re-compile and run the use_ctest program. For
 
 ## Automating the build process with GNU Make
 
-The build process can become quite tedious for all but the smallest projects. There are many ways that we might automate this process. The simplest would be to write a shell script that runs the build commands each time we invoke it. Let's take the simple `hello.c` program as a test case:
+The manual build process we used above can become quite tedious for all but the smallest projects. There are many ways that we might automate this process. The simplest would be to write a shell script that runs the build commands each time we invoke it. Let's take the simple `hello.c` program as a test case:
 ```shell
 #!/bin/bash
 gcc -c hello.c
@@ -488,12 +479,19 @@ clean:
 .PHONY: clean
 ```
 
-The syntax here is `target: prerequisite_1 prerequisite_2 etc`. The command block that follows will be executed to generate the target if any of the prerequisites have been modified.
+The syntax here is `target: prerequisite_1 prerequisite_2 etc`. The command block that follows will be executed to generate the target if any of the prerequisites have been modified. The first (top) target will be built by default, or you can specify a specific target to build following the `make` command. When we run `make` for the first time, the computer will take the following actions:
+1. Find the default target, which is our executable file `hello`.
+1. Check to see if `hello` is up-to-date, `hello` does not exist, so it is *not* up-to-date and will have to be built
+1. Check to see if the prerequisite `hello.o` is up-to-date, `hello.o` does not exist, so it is *not* up-to-date and will have to be built.
+1. The prerequisite `hello.c` is not a target, so there is nothing left to check. The command `gcc -c hello.c` will be run to build `hello.o`
+1. Now `hello.o` is up to date, so `make` builds the next target, `hello` by running the command `gcc hello.o -o hello`
+1. Done.
+
 
 We can then compile using the `make` command:
 ```shell
-make 
-make clean
+make clean 
+make
 ``` 
 
 Notice that if no changes are made to the source files, make does not recompile anything --- there is no need to do so.
@@ -530,49 +528,6 @@ clean:
         rm _____ _____
 ```
 
-## Building with Autotools: configure; make; make install
-
-For complex or widely distributed software packages with many dependencies, using Make alone can become a headache since you may have to find the location of numerous libraries and headers and modify the Makefile to work on your system. The Autotools workflow is one common solution to this issue. A typical build process is:
-```shell
-./configure
-make 
-make install
-```
-
-What is happening here is that the `configure` script automatically generates a Makefile that (should) work for your system. In practice, it often needs help finding libraries if they are hidden away in non-standard locations. For this purpose, there a typically a list of command-line parameters that you can add to the configure command line. Try:
-```shell 
-./configure --help
-```
-to see a list of the available options. One particularly common option is `--prefix`, which allows you to install in non-standard locations. 
-
-As a quick example, lets try compiling the program NCVIEW, a simple visualization tool for NetCDF datasets common in many scientific disciplines. The source code is in the `ncview-2.1.6.tag.gz` compressed file. 
-
-*Note: below is the script I wrote to do this build*
-```shell
-  #!/bin/bash
-  #
-  # Build ncview 2.1.4 for use on the BU SCC
-
-  # setup build environment
-  module load udunits
-  module load hdf5/1.8.11
-  module load netcdf/4.3.0
-  export LDFLAGS=-Wl,--enable-new-dtags
-
-  # build and install
-  cd build
-  ../src/configure \
-    --prefix=/projectnb/glaciermod/pkg/ncview/2.1.4/install \
-    --with-nc-config=/project/earth/packages/netcdf-4.3.0/bin/nc-config \
-    --with-udunits2_incdir=$SCC_UDUNITS_INCLUDE \
-    --with-udunits2_libdir=$SCC_UDUNITS_LIB
-
-  make clean
-  make 
-  make test 
-  make install
-```
-
 ## References
 
 - [GCC and Make: Compiling, Linking and Building C/C++ Applications](https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html)
@@ -580,6 +535,5 @@ As a quick example, lets try compiling the program NCVIEW, a simple visualizatio
 - [Programming in C: Writing Larger Programs](https://www.cs.cf.ac.uk/Dave/C/node35.html) 
 - [The Linux Information Project](http://www.linfo.org/)
 - [C/C++ library programming on Linux](http://www.techytalk.info/c-cplusplus-library-programming-on-linux-part-one-static-libraries/)
-- [Ncview: a netCDF visual browser](http://meteora.ucsd.edu/~pierce/ncview_home_page.html)
 - [Creating and using shared libraries in Linux](codingfreak.blogspot.com/2009/12/creating-and-using-shared-libraries-in.html)
 
