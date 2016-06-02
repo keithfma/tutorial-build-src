@@ -6,7 +6,7 @@
 * Create a new working directory, then make a copy of the example files for the tutorial, like so:  
 ```shell
 cd ~
-cp -r /projectnb/scv/keithma/tutorials/build_src/src .
+cp -r /projectnb/scv/keithma/teach/build_src/src .
 ```
 
 ## Overview
