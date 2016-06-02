@@ -2,12 +2,11 @@
 
 ## Preparation
 
-* Sign into the [Etherpad](https://etherpad.wikimedia.org/p/bu_tutorial_build_src), used for collaborative notes and an easy way to share commands and error messages.
 * Log into the SCC, either using the Mobaxterm on the lab computers or your favorite terminal on your laptop.
 * Create a new working directory, then make a copy of the example files for the tutorial, like so:  
 ```shell
 cd ~
-cp -r /projectnb/scv/keithma/tutorials/build_src/src tut
+cp -r /projectnb/scv/keithma/tutorials/build_src/src .
 ```
 
 ## Overview
@@ -16,9 +15,17 @@ This lesson plan covers the (very) basics of building small projects from C sour
 
 The material is not unique, and borrows heavily from the references listed at the end of the lesson. Comments are always welcome!
 
+First and foremost, *building* software from source means using compiler and linker programs to translate our program from a text file that encodes our program logic in a human-readable programming language (e.g. C, C++, Fortran, etc) to an executable (or library) that encodes our program in binary commands that our computer hardware can understand and execute.
+
+Building software can be very easy or very hard depending on the complexity of the source code, its dependecies, and the *build tools* used, and the details of the computer system you are on. An easy example would be a small project with a few files and hundreds to thousands of lines of code that only depends on standard libraries. One (very) difficult example would be a GPU-enabled machine learning toolkit (e.g. TensorFlow or similar), which depends on non-standard software and hardware.
+
+In this lesson, we cover only the ``easy'' case. Again the goal is to get a working mental model of what happens when we build software, and what may have gone wrong when things don't work as expected.
+
+There are many many compilers and build tools in use in the wild. We will use the [GNU Compiler Collection](https://gcc.gnu.org/) and [GNU Make](https://www.gnu.org/software/make/). These are common, open-source tools that are (very) widely used.
+
 ## Building a single-file program 
 
-Let's start with a simple example: building a "hello world" C program with the GCC compiler.
+Let's start with a simple example: building a "hello world" C program with the GCC compiler:
 
 Our program (`hello.c`) looks like this:
 ```c
