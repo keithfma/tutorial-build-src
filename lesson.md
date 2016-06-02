@@ -32,7 +32,13 @@ Our program (`hello.c`) looks like this:
 #include <stdio.h>
 main()
 {
+
+#ifdef LOUD
+    (void) printf("HELLO, WORLD!\n");
+#else
     (void) printf("Hello World\n");
+#endif
+
     return (0);
 }
 ```
@@ -68,7 +74,7 @@ Some common directives are:
 
   - `#define` 
     - macro substitution
-    - e.g. `#define PI 3.14159
+    - e.g. `#define PI 3.14159`
 
   - `#ifdef ... #end`
     - conditional compilation, the code block is included only if a certain macro is defined, e.g: 
@@ -83,7 +89,15 @@ We *could* perform just this step of the build process like so:
 cpp hello.c hello.i
 ```
 
-Examining the output file (**`vim hello.i`**) shows that the long and messy `stdio.h` header has been appended to our simple code. You may also like to explore adding `#define` statements, or conditional code blocks.
+Examining the output file (**`vim hello.i`**) shows that the long and messy `stdio.h` header has been appended to our simple code. 
+
+Let's explore the effect of the `#ifdef ... #else ... #endif` directives. We can define a macro on the command line using the `-D` option (a.k.a. flag) to the preprocessor, like so:
+```shell
+cpp -DLOUD hello.c hello_loud.i
+```
+Run the above commands and examine the differences between the two files. You will see that the preprocessor has modified our source code when we set the `LOUD` variable. This is a common way to make your code flexible at compile time, but still efficient at run time. 
+
+You may also like to explore adding `#define` statements, or conditional code blocks.
 
 ### Step 2: Compile
 
@@ -93,10 +107,10 @@ Assembly code is a low-level programming language with commands that correspond 
 
 To perform just the compilation step of the build process, we would run:
 ```shell
-gcc -S -c hello.i -o hello.i
+gcc -S -c hello.i -o hello.s
 ```
 
-Examining the output file (**`vim hello.s`**) shows that processor-specific instructions needed to run our program on this specific system. Interestingly, for such a simple program as ours, the assembly code is actually shorter than the preprocesses source code (though not the original source code).
+Examining the output file (**`less hello.s`**) shows that processor-specific instructions needed to run our program on this specific system. Interestingly, for such a simple program as ours, the assembly code is actually shorter than the preprocesses source code (though not the original source code).
 
 ### Step 3: Assemble
 
@@ -121,7 +135,7 @@ gcc hello.o -o hello
 ```
 ### Challege:
 
-Compile and run the following program (`squares.c`):
+Compile and run the following program (`squares.c`) to make an executable calle `squares`:
 ```c
 #include <stdio.h>
 main()
