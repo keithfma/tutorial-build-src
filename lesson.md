@@ -184,7 +184,7 @@ gcc WriteMyString.o main.o -o write
 
 ### Including header files
 
-Note that it is **not** necessary to include the header file on the `gcc` command line. This makes sense since we know that the (bundeled) preprocessing step will append any required headers to the source code before it is compiled.
+Note that it is **not** necessary to include the header file on the `gcc` command line. This makes sense since we know that the (bundled) preprocessing step will append any required headers to the source code before it is compiled.
 
 There is one caveat: the preprocessor must be able to find the header files in order to include them. Our example works because `header.h` is in the working directory when we run `gcc`. We can break it by moving the header to a new subdirectory, like so:
 ```shell
@@ -206,7 +206,7 @@ We can fix this by specifically telling `gcc` where it can find the requisite he
 gcc -I ./hdr main.c WriteMyString.c -o my_string
 ```
 
-This is most often need in the case where you wish to use external libraries installed in non-standard locations. We will explore this case below.
+This is most often needed in the case where you wish to use external libraries installed in non-standard locations. We will explore this case below.
 
 ### Challenge
 
@@ -254,7 +254,7 @@ Because of the advantage of dynamic linking, GCC will prefer a shared library to
 
 ### Building with shared libraries in default (known) locations
 
-Let's start with an example that uses the `sqrt()` function from the math library:
+Let's start with an example `roots.c` that uses the `sqrt()` function from the math library:
 ```c
 #include <stdio.h>
 #include <math.h>
