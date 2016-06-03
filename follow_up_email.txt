@@ -1,0 +1,14 @@
+SUBJECT: Building software from source code on Linux follow-up
+
+BODY:
+
+Hi everyone,
+
+Thanks for attending our Building Software from Source Code on Linux tutorial yesterday. I am writing to make sure that you have contact information the Research Computing Services team in case you need some help in the future. Feel free to contact us at Research Computing Services with problems big and small at any time. We are here to help and happy to do it. To reach us, you can submit a help request via the web at the link below, or by emailing ithelp@bu.edu. We hope to hear from you!
+
+  http://www.bu.edu/tech/contact/
+
+I wish you all the best of luck!
+
+Best,
+Keith
